@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist API - Cliente de Prueba</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-section, .list-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .tareas-list {
+            margin-top: 20px;
+        }
+        
+        .tarea-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        
+        .tarea-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .tarea-item.completada {
+            border-left-color: #28a745;
+            opacity: 0.8;
+        }
+        
+        .tarea-item.alta {
+            border-left-color: #dc3545;
+        }
+        
+        .tarea-item.media {
+            border-left-color: #ffc107;
+        }
+        
+        .tarea-item.baja {
+            border-left-color: #28a745;
+        }
+        
+        .tarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .tarea-descripcion {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .tarea-completada {
+            color: #28a745;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .tarea-meta {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-prioridad {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .badge-categoria {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tarea-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .tarea-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .response-log {
+            background: #1a1a1a;
+            color: #00ff9d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-title {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Checklist API</h1>
+            <p>API completa para gestión de tareas diarias con CRUD y CORS habilitado</p>
+            <div class="api-url">
+                <strong>URL Base:</strong> http://localhost:3000/api/tareas
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2><i class="fas fa-plus-circle"></i> Crear/Editar Tarea</h2>
+                
+                <div class="form-group">
+                    <label for="tareaId">ID (dejar vacío para crear nueva):</label>
+                    <input type="text" id="tareaId" placeholder="Dejar vacío para nueva tarea">
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <input type="text" id="descripcion" placeholder="Ej: Hacer ejercicio" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prioridad">Prioridad:</label>
+                    <select id="prioridad">
+                        <option value="baja">Baja</option>
+                        <option value="media" selected>Media</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <input type="text" id="categoria" placeholder="Ej: salud, trabajo, hogar" value="general">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fechaLimite">Fecha Límite (opcional):</label>
+                    <input type="text" id="fechaLimite" placeholder="YYYY-MM-DD">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="completada">
+                    <label for="completada">Marcar como completada</label>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="crearTarea()">
+                        <i class="fas fa-save"></i> Guardar Tarea
+                    </button>
+                    <button class="btn btn-secondary" onclick="limpiarFormulario()">
+                        <i class="fas fa-broom"></i> Limpiar
+                    </button>
+                </div>
+                
+                <div class="response-log">
+                    <div class="log-title">Log de Respuestas:</div>
+                    <div id="log"></div>
+                </div>
+            </div>
+            
+            <div class="list-section">
+                <h2><i class="fas fa-list"></i> Tareas</h2>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="cargarTareas()">
+                        <i class="fas fa-sync-alt"></i> Cargar Todas
+                    </button>
+                    <button class="btn btn-secondary" onclick="cargarPendientes()">
+                        <i class="fas fa-clock"></i> Pendientes
+                    </button>
+                    <button class="btn btn-secondary" onclick="cargarCompletadas()">
+                        <i class="fas fa-check-circle"></i> Completadas
+                    </button>
+                    <button class="btn btn-delete" onclick="eliminarCompletadas()">
+                        <i class="fas fa-trash"></i> Limpiar Completadas
+                    </button>
+                </div>
+                
+                <div class="tareas-list" id="tareasList">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No hay tareas cargadas. Haz clic en "Cargar Todas" para ver tus tareas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>API Checklist &copy; 2024 | CORS habilitado | Endpoints: GET, POST, PUT, DELETE, PATCH</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:3000/api/tareas";
+        let logElement = document.getElementById("log");
+        let tareasList = document.getElementById("tareasList");
+        
+        // Función para mostrar logs
+        function mostrarLog(mensaje, tipo = "info") {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = tipo === "error" ? "#ff6b6b" : tipo === "success" ? "#51cf66" : "#339af0";
+            logElement.innerHTML = `<span style="color: ${color}">[${timestamp}] ${mensaje}</span><br>${logElement.innerHTML}`;
+        }
+        
+        // Cargar todas las tareas
+        async function cargarTareas() {
+            try {
+                const response = await fetch(API_URL);
+                const tareas = await response.json();
+                mostrarTareas(tareas);
+                mostrarLog(`✓ Cargadas ${tareas.length} tareas`, "success");
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Cargar tareas pendientes
+        async function cargarPendientes() {
+            try {
+                const response = await fetch(`${API_URL}/pendientes`);
+                const tareas = await response.json();
+                mostrarTareas(tareas);
+                mostrarLog(`✓ Cargadas ${tareas.length} tareas pendientes`, "success");
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Cargar tareas completadas
+        async function cargarCompletadas() {
+            try {
+                const response = await fetch(`${API_URL}/completadas`);
+                const tareas = await response.json();
+                mostrarTareas(tareas);
+                mostrarLog(`✓ Cargadas ${tareas.length} tareas completadas`, "success");
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Mostrar tareas en la lista
+        function mostrarTareas(tareas) {
+            if (tareas.length === 0) {
+                tareasList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No hay tareas para mostrar.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            tareasList.innerHTML = "";
+            tareas.forEach(tarea => {
+                const tareaElement = document.createElement("div");
+                tareaElement.className = `tarea-item ${tarea.completada ? 'completada' : ''} ${tarea.prioridad}`;
+                
+                const fechaCreacion = new Date(tarea.fechaCreacion).toLocaleDateString();
+                const fechaLimite = tarea.fechaLimite ? new Date(tarea.fechaLimite).toLocaleDateString() : 'Sin fecha límite';
+                
+                tareaElement.innerHTML = `
+                    <div class="tarea-header">
+                        <div>
+                            <div class="tarea-descripcion">${tarea.descripcion}</div>
+                            <div class="tarea-meta">
+                                <span class="badge badge-prioridad">${tarea.prioridad}</span>
+                                <span class="badge badge-categoria">${tarea.categoria}</span>
+                                <span><i class="far fa-calendar-plus"></i> ${fechaCreacion}</span>
+                                <span><i class="far fa-calendar-check"></i> ${fechaLimite}</span>
+                            </div>
+                        </div>
+                        <div class="tarea-completada">
+                            ${tarea.completada ? '<i class="fas fa-check-circle"></i> Completada' : '<i class="far fa-circle"></i> Pendiente'}
+                        </div>
+                    </div>
+                    <div class="tarea-actions">
+                        <button class="btn" onclick="toggleCompletada(${tarea.id})">
+                            <i class="fas fa-toggle-${tarea.completada ? 'off' : 'on'}"></i> ${tarea.completada ? 'Marcar Pendiente' : 'Marcar Completada'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="editarTarea(${tarea.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-delete" onclick="eliminarTarea(${tarea.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                `;
+                
+                tareasList.appendChild(tareaElement);
+            });
+        }
+        
+        // Crear o actualizar tarea
+        async function crearTarea() {
+            const tareaId = document.getElementById("tareaId").value;
+            const descripcion = document.getElementById("descripcion").value;
+            const prioridad = document.getElementById("prioridad").value;
+            const categoria = document.getElementById("categoria").value;
+            const fechaLimite = document.getElementById("fechaLimite").value;
+            const completada = document.getElementById("completada").checked;
+            
+            if (!descripcion.trim()) {
+                mostrarLog("✗ La descripción es requerida", "error");
+                return;
+            }
+            
+            const tareaData = {
+                descripcion,
+                prioridad,
+                categoria,
+                completada
+            };
+            
+            if (fechaLimite) {
+                tareaData.fechaLimite = fechaLimite;
+            }
+            
+            try {
+                let response;
+                if (tareaId) {
+                    // Actualizar tarea existente
+                    response = await fetch(`${API_URL}/${tareaId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(tareaData)
+                    });
+                    mostrarLog(`✓ Tarea #${tareaId} actualizada`, "success");
+                } else {
+                    // Crear nueva tarea
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(tareaData)
+                    });
+                    mostrarLog("✓ Nueva tarea creada", "success");
+                }
+                
+                const resultado = await response.json();
+                console.log("Resultado:", resultado);
+                limpiarFormulario();
+                cargarTareas();
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Editar tarea (cargar en formulario)
+        async function editarTarea(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const tarea = await response.json();
+                
+                document.getElementById("tareaId").value = tarea.id;
+                document.getElementById("descripcion").value = tarea.descripcion;
+                document.getElementById("prioridad").value = tarea.prioridad;
+                document.getElementById("categoria").value = tarea.categoria;
+                document.getElementById("completada").checked = tarea.completada;
+                document.getElementById("fechaLimite").value = tarea.fechaLimite ? tarea.fechaLimite.split('T')[0] : '';
+                
+                mostrarLog(`✓ Tarea #${id} cargada para edición`, "success");
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Eliminar tarea
+        async function eliminarTarea(id) {
+            if (!confirm(`¿Eliminar tarea #${id}?`)) return;
+            
+            try {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                mostrarLog(`✓ Tarea #${id} eliminada`, "success");
+                cargarTareas();
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Alternar estado de completada
+        async function toggleCompletada(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}/toggle`, {
+                    method: 'PATCH'
+                });
+                
+                const tarea = await response.json();
+                mostrarLog(`✓ Tarea #${id} ${tarea.completada ? 'completada' : 'pendiente'}`, "success");
+                cargarTareas();
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Eliminar todas las tareas completadas
+        async function eliminarCompletadas() {
+            if (!confirm("¿Eliminar todas las tareas completadas?")) return;
+            
+            try {
+                await fetch(`${API_URL}/completadas`, {
+                    method: 'DELETE'
+                });
+                
+                mostrarLog("✓ Tareas completadas eliminadas", "success");
+                cargarTareas();
+            } catch (error) {
+                mostrarLog(`✗ Error: ${error.message}`, "error");
+            }
+        }
+        
+        // Limpiar formulario
+        function limpiarFormulario() {
+            document.getElementById("tareaId").value = "";
+            document.getElementById("descripcion").value = "";
+            document.getElementById("prioridad").value = "media";
+            document.getElementById("categoria").value = "general";
+            document.getElementById("fechaLimite").value = "";
+            document.getElementById("completada").checked = false;
+            mostrarLog("Formulario limpiado", "info");
+        }
+        
+        // Cargar tareas al iniciar
+        document.addEventListener("DOMContentLoaded", cargarTareas);
+    </script>
+</body>
+</html>
